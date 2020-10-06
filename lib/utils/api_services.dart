@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:sijaka/models/login.dart';
+import 'package:sijaka/models/data_kota.dart';
 import 'package:sijaka/utils/sharepref.dart';
 
 class ApiServices {
@@ -36,7 +37,7 @@ class ApiServices {
     }
   }
 
-  Future dataPresentase(String token) async {
+  Future<DataKota> getDataKota(String token) async {
     var response = await http.get(
       "$baseUrl/data",
       headers: {
@@ -46,9 +47,29 @@ class ApiServices {
        },
     );
 
-    if(response.statusCode == 200) {
-      print("berhasil");
-      print(response.body);
+    if (response.statusCode == 200) {
+      var dataKota = DataKota.fromJson(jsonDecode(response.body));
+      return dataKota;
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> logout(String token) async {
+    var response = await http.post(
+      "$baseUrl/logout",
+      headers: {
+         "Accept": "application/json",
+         "Content-Type": "application/x-www-form-urlencoded",
+         'Authorization': 'Bearer $token'
+       },
+    );
+
+    if (response.statusCode == 200) {
+      SharePref().hapusSharefPref();
+      return true;
+    } else {
+      return false;
     }
   }
 }

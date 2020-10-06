@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sijaka/models/data_kelurahan.dart';
 import 'package:sijaka/utils/api_services.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,18 +10,50 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  String dropdownValue = "Banjarmasin Tengah";
+  String dropdownValue;
+  Map<String, dynamic> dataTuntas = Map();
+  List dataKecamatan = [];
+  String token = "";
+  List<DataKelurahan> dataKelurahan = [];
+  bool loading = true;
+  String namaKota = "";
 
   @override
   void initState() {
     super.initState();
-    // token();
+    getData();
   }
 
-  void token() async {
+  void getData() async {
+    dataKelurahan.clear();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
-    ApiServices().dataPresentase(token);
+    token = prefs.getString('token');
+
+    ApiServices().getDataKota(token).then((dataKota) {
+      if (dataKota == null) {
+        return;
+      } 
+      setState(() {
+        loading = !loading;
+
+        namaKota = prefs.getString("full_name");
+
+        dataKecamatan = dataKota.data['data_kec'];
+        if (dropdownValue == null) dropdownValue = dataKecamatan[0];
+        dataTuntas = dataKota.data['ketuntasan'];
+
+        Map<String, dynamic> kelurahan = dataKota.data['dataProvider'][dropdownValue];
+        kelurahan.keys.forEach((element) {
+          var kel = kelurahan[element]['kelurahan'];
+          var presentase = kelurahan[element]['presentase'];
+          dataKelurahan.add(
+            DataKelurahan(kelurahan: kel, presentase: presentase)
+          );
+        });
+
+        print(dataKelurahan[0].kelurahan);
+      });
+    });
   }
 
   @override
@@ -40,18 +73,11 @@ class _HomePageState extends State<HomePage> {
             numeric: true
           )
         ],
-        rows: [
-          DataRow(cells: [
-            DataCell(Text('Banjarmasin Tengah')),
-            DataCell(Text('40')),
-            DataCell(Text('4'))
-          ]),
-          DataRow(cells: [
-            DataCell(Text('Banjarmasin Barat')),
-            DataCell(Text('20')),
-            DataCell(Text('3'))
-          ])
-        ],
+        rows: dataKecamatan.map((kec) => DataRow(cells: [
+          DataCell(Text(kec)),
+          DataCell(Text(dataTuntas['tuntas'][kec].toString())),
+          DataCell(Text(dataTuntas['belum_tuntas'][kec].toString()))
+        ])).toList(),
       );
     }
 
@@ -65,35 +91,31 @@ class _HomePageState extends State<HomePage> {
             numeric: true
           ),
         ],
-        rows: [
-          DataRow(cells: [
-            DataCell(Text('Sungai Jingah')),
-            DataCell(Text('40%'))
-          ]),
-          DataRow(cells: [
-            DataCell(Text('Sungai Miai')),
-            DataCell(Text('20%'))
-          ])
-        ],
+        rows: dataKelurahan.map((data) => DataRow(cells: [
+          DataCell(Text(data.kelurahan)),
+          DataCell(Text('${data.presentase.toString()}%'))
+        ])).toList(),
       );
     }
 
     Widget dropDown() {
-      return DropdownButton<String>(
+      return DropdownButton(
         value: dropdownValue,
         elevation: 16,
         underline: Container(
           height: 2,
           color: Colors.black,
         ),
-        onChanged: (String newValue) {
+        onChanged: (newValue) {
           setState(() {
+            loading = !loading;
             dropdownValue = newValue;
+            getData();
           });
         },
-        items: <String>['Banjarmasin Barat', 'Banjarmasin Tengah', 'Banjarmasin Utara', 'Banjarmasin Selatan']
-          .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
+        items: dataKecamatan
+          .map((value) {
+            return DropdownMenuItem(
               value: value,
               child: Text(value),
             );
@@ -105,18 +127,35 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Kota Banjarmasin'),
+          title: Text(namaKota ?? ""),
           actions: [
+            IconButton(
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                setState(() {
+                  loading = !loading;
+                  dropdownValue = null;
+                  getData();
+                });
+              },
+            ),
             IconButton(
               icon: Icon(Icons.person),
               onPressed: () {
                 Navigator.pushNamed(context, '/profile');
               },
-            )
+            ),
           ],
         ),
         body: ListView(
           children: [
+            Visibility(
+              visible: loading,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                child: LinearProgressIndicator(),
+              ),
+            ),
             ketuntasan(),
             SizedBox(height: 16.0),
             Padding(

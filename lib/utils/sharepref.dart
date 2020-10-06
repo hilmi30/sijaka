@@ -8,5 +8,11 @@ class SharePref {
     prefs.setInt('id', login.id);
     prefs.setString('email', login.email);
     prefs.setString('token', login.token);
+    prefs.setString('full_name', login.profile[0]['full_name']);
+  }
+
+  void hapusSharefPref() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
   }
 }
