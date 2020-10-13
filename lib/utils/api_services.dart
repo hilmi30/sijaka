@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:device_info/device_info.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sijaka/models/login.dart';
 import 'package:sijaka/models/data_kota.dart';
 import 'package:sijaka/utils/sharepref.dart';
@@ -10,11 +12,15 @@ class ApiServices {
   final baseUrl = "https://sijaka.kartinimedia.com/api/web/index.php?r=v1/auth";
 
   Future<bool> login(String username, String password) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     var response = await http.post(
       "$baseUrl/login",
       body: {
         'username': username,
-        'password': password
+        'password': password,
+        'fcm': prefs.getString('fcmToken')
       },
       headers: {
          "Accept": "application/json",
@@ -56,13 +62,19 @@ class ApiServices {
   }
 
   Future<bool> logout(String token) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
     var response = await http.post(
       "$baseUrl/logout",
       headers: {
          "Accept": "application/json",
          "Content-Type": "application/x-www-form-urlencoded",
          'Authorization': 'Bearer $token'
-       },
+      },
+      body: {
+        'fcm': prefs.getString('fcmToken')
+      }
     );
 
     if (response.statusCode == 200) {

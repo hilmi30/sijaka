@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,22 +8,24 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
+  
+  FirebaseMessaging fm = FirebaseMessaging();
 
-  @override
-  void initState() {
-    super.initState();
-    checkUser();
+  _LandingPageState() {
+    fm.getToken().then((fcmToken) {
+      checkUser(fcmToken);
+    });
+    fm.configure();
   }
 
-  void checkUser() async {
+  void checkUser(String fcmToken) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('fcmToken', fcmToken);
     var token = prefs.getString('token');
     if (token == null || token == '') {
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/login', ModalRoute.withName('/login'));
+      Navigator.pushReplacementNamed(context, '/login');
     } else {
-      Navigator.pushNamedAndRemoveUntil(
-          context, '/home', ModalRoute.withName('/home'));
+      Navigator.pushReplacementNamed(context, '/home');
     }
   }
 

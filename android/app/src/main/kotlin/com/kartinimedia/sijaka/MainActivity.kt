@@ -1,4 +1,4 @@
-package com.kartinimedia.sijaka.sijaka
+package com.kartinimedia.sijaka
 
 import io.flutter.embedding.android.FlutterActivity
 

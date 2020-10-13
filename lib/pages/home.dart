@@ -58,7 +58,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     Widget ketuntasan() {
       return DataTable(
         showBottomBorder: true,

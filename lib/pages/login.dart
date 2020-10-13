@@ -97,7 +97,8 @@ class _LoginPageState extends State<LoginPage> {
                                   });
 
                                   if (status) {
-                                    print('berhasil login');
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context, '/home', ModalRoute.withName('/home'));
                                   } else {
                                     showDialog(
                                       barrierDismissible: false,

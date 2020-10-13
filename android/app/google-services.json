@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "376133757273",
+    "firebase_url": "https://sijaka-f87e4.firebaseio.com",
+    "project_id": "sijaka-f87e4",
+    "storage_bucket": "sijaka-f87e4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:376133757273:android:5e69db69be954194b54448",
+        "android_client_info": {
+          "package_name": "com.kartinimedia.sijaka"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "376133757273-0ica3ndp3djrb084nps5k1krrb6loh45.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuTrqHBklRs7Aewb-caiEl9VxMGHCLE2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "376133757273-0ica3ndp3djrb084nps5k1krrb6loh45.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

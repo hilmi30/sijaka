@@ -1,5 +1,3 @@
-import 'package:sijaka/models/profile.dart';
-
 class Login {
   int id;
   String email;
@@ -13,7 +11,7 @@ class Login {
       id: json['id'],
       email: json['email'],
       profile: json['profile'],
-      token: json['token']
+      token: json['token'],
     );
   } 
 }

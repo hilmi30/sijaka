@@ -11,6 +11,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   bool loading = false;
   String namaKota = "";
+  String username = "";
+  String token = "";
 
   @override
   void initState() {
@@ -22,6 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       namaKota = prefs.getString('full_name');
+      username = prefs.getString('email');
+      token = prefs.getString('token');
     });
   }
 
@@ -38,52 +42,33 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Visibility(
-                visible: true,
-                child: LinearProgressIndicator()
+                visible: loading,
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 30, right: 30),
+                  child: Column(
+                    children: [
+                      LinearProgressIndicator(),
+                      SizedBox(height: 32,)
+                    ],
+                  ),
+                )
               ),
               Text(namaKota ?? "", textAlign: TextAlign.center,
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,)),
               SizedBox(height: 8.0),
-              Text('banjarmasin@mail.com', textAlign: TextAlign.center,),
+              Text(username ?? "", textAlign: TextAlign.center,),
               SizedBox(height: 16.0),
               FlatButton(
                 child: Text('Keluar', style: TextStyle(color: Colors.red),),
                 onPressed: () {
-                  showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Keluar"),
-                        content: Text("Yakin ingin keluar?"),
-                        actions: [
-                          FlatButton(
-                            child: Text("Ya"),
-                            onPressed: !loading ? () async {
-                              Navigator.pop(context);
-                              setState(() {
-                                loading = !loading;
-                              });
-                              SharedPreferences prefs = await SharedPreferences.getInstance();
-                              var token = prefs.getString('token');
-                              ApiServices().logout(token).then((status) {
-                                if (status) {
-                                  Navigator.pushNamedAndRemoveUntil(
-                                    context, '/login', ModalRoute.withName('/login'));
-                                }
-                              });
-                            } : null,
-                          ),
-                          FlatButton(
-                            child: Text("Tidak"),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          )
-                        ],
-                      );
-                    },
-                  );
+                  setState(() {
+                    loading = !loading;
+                  });
+                  ApiServices().logout(token).then((status) {
+                    if (status) {
+                      Navigator.pushReplacementNamed(context, '/login');
+                    }
+                  });
                 },
               )
             ]
