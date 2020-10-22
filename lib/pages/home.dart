@@ -50,8 +50,6 @@ class _HomePageState extends State<HomePage> {
             DataKelurahan(kelurahan: kel, presentase: presentase)
           );
         });
-
-        print(dataKelurahan[0].kelurahan);
       });
     });
   }

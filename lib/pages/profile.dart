@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sijaka/pages/login.dart';
 import 'package:sijaka/utils/api_services.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -66,7 +67,14 @@ class _ProfilePageState extends State<ProfilePage> {
                   });
                   ApiServices().logout(token).then((status) {
                     if (status) {
-                      Navigator.pushReplacementNamed(context, '/login');
+                      // Navigator.pushReplacementNamed(context, '/login');
+                      Navigator.pushAndRemoveUntil(
+                        context, 
+                        MaterialPageRoute(
+                          builder: (context) => LoginPage()
+                        ), 
+                        ModalRoute.withName("/login")
+                      );
                     }
                   });
                 },
